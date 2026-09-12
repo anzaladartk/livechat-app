@@ -18,4 +18,23 @@ const protect = (req, res, next) => {
   }
 };
 
-module.exports = { protect };
+// Like protect, but never rejects — attaches req.userId only when a valid
+// token is present. For routes that stay public but add extra per-viewer
+// context when the caller happens to be logged in (e.g. "am I a member of
+// this room" on the public room directory).
+const optionalAuth = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  const token = authHeader && authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : null;
+
+  if (token) {
+    try {
+      req.userId = jwt.verify(token, process.env.JWT_SECRET).id;
+    } catch (error) {
+      // Invalid/expired token on an optional-auth route: treat as anonymous.
+    }
+  }
+
+  next();
+};
+
+module.exports = { protect, optionalAuth };

@@ -1,12 +1,13 @@
 const express = require('express');
 const { list, create, getById, join, leave } = require('../controllers/roomController');
-const { protect } = require('../middleware/auth');
+const { protect, optionalAuth } = require('../middleware/auth');
 const { validate, createRoomValidation } = require('../middleware/validation');
 
 const router = express.Router();
 
 // Public directory listing — no PII exposed, just name/description/memberCount.
-router.get('/', list);
+// optionalAuth adds `isMember` per room when the caller happens to be logged in.
+router.get('/', optionalAuth, list);
 
 router.post('/', protect, createRoomValidation, validate, create);
 // Requires login: reveals the members list (name/avatar), not public directory info.

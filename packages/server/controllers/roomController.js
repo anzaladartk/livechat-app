@@ -50,6 +50,9 @@ const list = async (req, res, next) => {
         description: room.description,
         memberCount: room.memberCount,
         createdAt: room.createdAt,
+        // members is already fetched on each doc (no .select() restricting
+        // it), so this costs nothing extra — false for anonymous viewers.
+        isMember: req.userId ? room.members.some((id) => id.toString() === req.userId) : false,
       })),
       total,
       page,
