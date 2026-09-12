@@ -24,4 +24,14 @@ const loginValidation = [
   body('password').notEmpty().withMessage('Password is required'),
 ];
 
-module.exports = { validate, registerValidation, loginValidation };
+const createRoomValidation = [
+  body('name').trim().notEmpty().withMessage('Room name is required').isLength({ max: 50 }).withMessage('Room name must be 50 characters or fewer'),
+  body('description').optional().trim().isLength({ max: 200 }).withMessage('Description must be 200 characters or fewer'),
+];
+
+const profileUpdateValidation = [
+  body('name').optional().trim().notEmpty().withMessage('Name cannot be empty').isLength({ max: 50 }).withMessage('Name must be 50 characters or fewer'),
+  body('avatar').optional().trim().isLength({ max: 500 }).withMessage('Avatar URL is too long'),
+];
+
+module.exports = { validate, registerValidation, loginValidation, createRoomValidation, profileUpdateValidation };

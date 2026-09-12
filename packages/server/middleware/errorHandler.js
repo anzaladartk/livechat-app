@@ -14,6 +14,11 @@ const errorHandler = (err, req, res, next) => {
     return res.status(400).json({ success: false, message });
   }
 
+  // Malformed ObjectId in a route param (e.g. GET /api/rooms/not-a-real-id)
+  if (err.name === 'CastError') {
+    return res.status(400).json({ success: false, message: `Invalid ${err.path}: ${err.value}` });
+  }
+
   const statusCode = err.statusCode || 500;
   res.status(statusCode).json({ success: false, message: err.message || 'Server error' });
 };
