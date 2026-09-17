@@ -1,5 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 import { formatRelativeDate } from '../../utils/formatDate';
+import { truncate } from '../../utils/helpers';
+
+const DESCRIPTION_MAX_LENGTH = 100;
 
 export default function RoomCard({ room, onJoin, onLeave }) {
   const navigate = useNavigate();
@@ -17,7 +20,9 @@ export default function RoomCard({ room, onJoin, onLeave }) {
     <div className="flex items-center justify-between rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
       <div>
         <h3 className="font-semibold text-gray-900">{room.name}</h3>
-        {room.description && <p className="text-sm text-gray-500">{room.description}</p>}
+        {room.description && (
+          <p className="text-sm text-gray-500">{truncate(room.description, DESCRIPTION_MAX_LENGTH)}</p>
+        )}
         <p className="mt-1 text-xs text-gray-400">
           {room.memberCount} member{room.memberCount === 1 ? '' : 's'} · created {formatRelativeDate(room.createdAt)}
         </p>

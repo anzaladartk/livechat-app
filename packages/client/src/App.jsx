@@ -5,6 +5,7 @@ import { useSocket } from './hooks/useSocket';
 import ChatPage from './pages/ChatPage';
 import LoginPage from './pages/LoginPage';
 import NotFound from './pages/NotFound';
+import ProfilePage from './pages/ProfilePage';
 import RegisterPage from './pages/RegisterPage';
 import RoomsPage from './pages/RoomsPage';
 import { useAuthStore } from './store/authStore';
@@ -29,6 +30,7 @@ function App() {
       <Route element={<ProtectedRoute />}>
         <Route path="/rooms" element={<RoomsPage />} />
         <Route path="/rooms/:roomId" element={<ChatPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
       </Route>
 
       <Route path="/" element={<Navigate to="/rooms" replace />} />

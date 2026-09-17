@@ -1,21 +1,27 @@
 import { useEffect, useRef, useState } from 'react';
 import { emitStopTyping, emitTyping, sendMessage } from '../../services/socketService';
+import { debounce } from '../../utils/helpers';
 
-const TYPING_DEBOUNCE_MS = 2000;
+const TYPING_STOP_DELAY_MS = 2000;
+const TYPING_EMIT_DEBOUNCE_MS = 300;
 const MAX_MESSAGE_LENGTH = 1000;
 
 export default function MessageInput({ roomId, userName }) {
   const [text, setText] = useState('');
   const typingTimeoutRef = useRef(null);
+  // Debounced so continuous typing emits at most once per window instead of
+  // flooding the socket on every keystroke; the "stopped typing" signal below
+  // still fires promptly via its own inactivity timer.
+  const debouncedEmitTyping = useRef(debounce(emitTyping, TYPING_EMIT_DEBOUNCE_MS)).current;
 
   useEffect(() => () => clearTimeout(typingTimeoutRef.current), []);
 
   const handleChange = (e) => {
     setText(e.target.value);
 
-    emitTyping(roomId, userName);
+    debouncedEmitTyping(roomId, userName);
     clearTimeout(typingTimeoutRef.current);
-    typingTimeoutRef.current = setTimeout(() => emitStopTyping(roomId), TYPING_DEBOUNCE_MS);
+    typingTimeoutRef.current = setTimeout(() => emitStopTyping(roomId), TYPING_STOP_DELAY_MS);
   };
 
   const handleSubmit = (e) => {
