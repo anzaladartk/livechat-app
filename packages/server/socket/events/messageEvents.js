@@ -1,4 +1,5 @@
 const Message = require('../../models/Message');
+const Room = require('../../models/Room');
 const User = require('../../models/User');
 
 const MAX_MESSAGE_LENGTH = 1000;
@@ -11,6 +12,13 @@ const registerMessageEvents = (io, socket) => {
     try {
       if (!roomId || typeof text !== 'string' || !text.trim()) {
         return socket.emit('error', { message: 'Message text is required' });
+      }
+
+      // Being logged in isn't the same as being a member of THIS room —
+      // without this check, any authenticated user could post into any room.
+      const room = await Room.findById(roomId);
+      if (!room || !room.members.some((id) => id.toString() === socket.userId)) {
+        return socket.emit('error', { message: 'You must join this room first' });
       }
 
       const trimmed = text.trim();

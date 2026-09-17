@@ -1,6 +1,8 @@
 import { useEffect } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import ProtectedRoute from './components/Auth/ProtectedRoute';
+import { useSocket } from './hooks/useSocket';
+import ChatPage from './pages/ChatPage';
 import LoginPage from './pages/LoginPage';
 import NotFound from './pages/NotFound';
 import RegisterPage from './pages/RegisterPage';
@@ -16,6 +18,9 @@ function App() {
     verify();
   }, [verify]);
 
+  // Connects the live socket whenever a token exists, disconnects on logout.
+  useSocket();
+
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
@@ -23,6 +28,7 @@ function App() {
 
       <Route element={<ProtectedRoute />}>
         <Route path="/rooms" element={<RoomsPage />} />
+        <Route path="/rooms/:roomId" element={<ChatPage />} />
       </Route>
 
       <Route path="/" element={<Navigate to="/rooms" replace />} />

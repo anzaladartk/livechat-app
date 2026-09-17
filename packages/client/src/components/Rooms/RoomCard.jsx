@@ -1,6 +1,18 @@
+import { useNavigate } from 'react-router-dom';
 import { formatRelativeDate } from '../../utils/formatDate';
 
 export default function RoomCard({ room, onJoin, onLeave }) {
+  const navigate = useNavigate();
+
+  const handleJoin = async () => {
+    try {
+      await onJoin(room);
+      navigate(`/rooms/${room._id}`);
+    } catch {
+      // onJoin already surfaced the error via RoomsList's actionError state.
+    }
+  };
+
   return (
     <div className="flex items-center justify-between rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
       <div>
@@ -11,21 +23,31 @@ export default function RoomCard({ room, onJoin, onLeave }) {
         </p>
       </div>
 
-      {room.isMember ? (
-        <button
-          onClick={() => onLeave(room)}
-          className="whitespace-nowrap rounded-lg bg-gray-100 px-4 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-200"
-        >
-          Leave
-        </button>
-      ) : (
-        <button
-          onClick={() => onJoin(room)}
-          className="whitespace-nowrap rounded-lg bg-blue-500 px-4 py-1.5 text-sm font-medium text-white hover:bg-blue-600"
-        >
-          Join
-        </button>
-      )}
+      <div className="flex shrink-0 gap-2">
+        {room.isMember ? (
+          <>
+            <button
+              onClick={() => navigate(`/rooms/${room._id}`)}
+              className="whitespace-nowrap rounded-lg bg-blue-500 px-4 py-1.5 text-sm font-medium text-white hover:bg-blue-600"
+            >
+              Open
+            </button>
+            <button
+              onClick={() => onLeave(room)}
+              className="whitespace-nowrap rounded-lg bg-gray-100 px-4 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-200"
+            >
+              Leave
+            </button>
+          </>
+        ) : (
+          <button
+            onClick={handleJoin}
+            className="whitespace-nowrap rounded-lg bg-blue-500 px-4 py-1.5 text-sm font-medium text-white hover:bg-blue-600"
+          >
+            Join
+          </button>
+        )}
+      </div>
     </div>
   );
 }
